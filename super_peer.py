@@ -19,5 +19,5 @@ class SuperPeer:
     def receive_message(self):
         while True:
             data, addr = self.socket.recvfrom(1024)
-            data_str = data.decode("utf-8")
+            data_str = data.decode('utf-8')
             print(self.name, data_str, addr)

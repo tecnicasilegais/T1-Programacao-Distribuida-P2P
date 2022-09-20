@@ -33,7 +33,7 @@ def filter_args():
 
 
 def create_peer():
-    sp = get_random_sp()
+    sp = get_random_sp()  # choose a random super peer to connect
     peer.Peer(sys.argv[2], int(sys.argv[3]), (sp[1]['addr'], sp[1]['port']))
 
 
@@ -48,7 +48,7 @@ def read_config():
     global configs
     file = open('config.json')
     configs = json.loads(file.read())
-    
+
 
 def get_config(peer_id, key):
     global configs

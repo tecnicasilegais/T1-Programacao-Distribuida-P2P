@@ -1,29 +1,27 @@
+import json
 import os
-import random
 import socket
-import string
-import hashlib
 
-
-def generate_random_text(size=100):
-    size = random.randint(1, size)
-    return ''.join(random.choice(string.ascii_letters) for _ in range(size))
-
-
-def file_to_hash(file):
-    return hashlib.sha256(file.encode()).hexdigest()  # usar outra coisa que gere um hash mais simples
-
+from util import generate_random_text, file_to_hash, create_message, MsgType
 
 class Peer:
 
     def __init__(self, addr, port, random_sp_addr):
+        self.files = dict()
         self.addr = addr
         self.port = port
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.socket.bind((addr, port))
         self.random_sp_addr = random_sp_addr
-        self.create_folder_and_file()
-        self.read_and_send_files()
+        self.create_files()
+        self.send_files_info()
+
+    def send_files_info(self):
+        self.send_message(self.random_sp_addr, create_message(MsgType.FILE_INFO, self.files))
+
+    def create_files(self):
+        for i in range(2):
+            self.files[generate_random_text(4) + '.exe'] = file_to_hash(generate_random_text())
 
     def create_folder_and_file(self):
         self.create_folder()

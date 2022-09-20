@@ -11,40 +11,40 @@ def generate_random_text(size=100):
 
 
 def file_to_hash(file):
-    return hashlib.sha256(file.encode()).hexdigest() # usar outra coisa que gere um hash mais simples 
+    return hashlib.sha256(file.encode()).hexdigest()  # usar outra coisa que gere um hash mais simples
 
 
 class Peer:
 
-    def __init__(self, addr, port,  random_sp=''):
+    def __init__(self, addr, port, random_sp_addr):
         self.addr = addr
         self.port = port
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.socket.bind((addr, port))
-        self.random_sp = random_sp
+        self.random_sp_addr = random_sp_addr
         self.create_folder_and_file()
-        self.read_files()
+        self.read_and_send_files()
 
     def create_folder_and_file(self):
         self.create_folder()
         self.create_random_files()
 
     def create_folder(self):
-        if not os.path.exists('file/' + self.name):
-            os.makedirs('file/' + self.name)
+        if not os.path.exists('file/' + self.addr):
+            os.makedirs('file/' + self.addr)
 
     def create_random_files(self):
         for i in range(2):
-            file = open('file/' + self.name + '/' + generate_random_text(4) + '-' + self.name + '.txt', 'w')
+            file = open('file/' + self.addr + '/' + generate_random_text(4) + '-' + self.addr + '.txt', 'w')
             file.write(generate_random_text())
             file.close()
 
-    def read_files(self):
-        for file in os.listdir('file/' + self.name):
+    def read_and_send_files(self):
+        for file in os.listdir('file/' + self.addr):
             self.send_hash(file)
 
     def send_hash(self, file):
-        self.send_message(self.random_sp, file_to_hash(file))
+        self.send_message(self.random_sp_addr, file_to_hash(file))
 
-    def send_message(self, addr, message):
-        self.socket.sendto(message.encode(), addr) 
+    def send_message(self, random_sp_addr, message):
+        self.socket.sendto(message.encode(), random_sp_addr)

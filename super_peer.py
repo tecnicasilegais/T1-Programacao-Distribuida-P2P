@@ -13,7 +13,10 @@ class SuperPeer:
         self.socket.bind((addr, port))
         
         self.receive_message_thread = threading.Thread(target=self.receive_message)
-        
-    def receive_message(self):
-        pass # Não sei como fazer isso
+        self.receive_message_thread.start()
+        print(self.next_peer)
 
+    def receive_message(self):
+        while True:
+            data, addr = self.socket.recvfrom(1024)
+            print(data, addr)

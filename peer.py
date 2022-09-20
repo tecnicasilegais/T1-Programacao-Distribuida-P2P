@@ -16,9 +16,8 @@ def file_to_hash(file):
 
 class Peer:
 
-    def __init__(self, name, addr, port,  random_sp=''):
+    def __init__(self, addr, port,  random_sp=''):
         self.addr = addr
-        self.name = name
         self.port = port
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.socket.bind((addr, port))
@@ -36,7 +35,7 @@ class Peer:
 
     def create_random_files(self):
         for i in range(2):
-            file = open('file/' + self.name + "/" + generate_random_text(4) + '-' + self.name + ".txt", "w")
+            file = open('file/' + self.name + '/' + generate_random_text(4) + '-' + self.name + '.txt', 'w')
             file.write(generate_random_text())
             file.close()
 

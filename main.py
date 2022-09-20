@@ -31,7 +31,7 @@ def filter_args():
 
 
 def create_peer():
-    peer.Peer('peer1',sys.argv[2], int(sys.argv[3]),("127.0.0.100", 4941))
+    peer.Peer(sys.argv[2], int(sys.argv[3]), ("127.0.0.100", 4941))
 
 
 def create_super_peer():

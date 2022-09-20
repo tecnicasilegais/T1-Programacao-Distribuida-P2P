@@ -17,7 +17,7 @@ def create_peer():
     superpeer_number = 0
     while True:
         superpeer_number = int(input("Numero de super nodes:"))
-        if superpeer_number > 0 and superpeer_number <= len(configs):
+        if 0 < superpeer_number <= len(configs):
             break
         else:
             print("Numero invalido")

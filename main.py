@@ -1,4 +1,3 @@
-import random
 import peer
 import super_peer
 import json
@@ -6,8 +5,6 @@ import sys
 from util import parameter_error_message, display_help
 
 configs = dict()
-super_peer_list = []
-
 
 def main():
     print(sys.argv)
@@ -39,12 +36,9 @@ def create_peer():
 
 
 def create_super_peer():
-    global super_peer_list
     for index, peer_name in enumerate(configs):
         super_peer.SuperPeer(peer_name, get_config(index, 'addr'), get_config(index, 'port'),
                             get_config(index, 'next'))
-        super_peer_list.append((get_config(index, 'addr'), get_config(index, 'port')))
-
 
 def read_config():
     global configs

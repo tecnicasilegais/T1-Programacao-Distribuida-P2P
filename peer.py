@@ -30,17 +30,17 @@ class Peer:
         self.create_random_files()
 
     def create_folder(self):
-        if not os.path.exists('file/' + self.name):
-            os.makedirs('file/' + self.name)
+        if not os.path.exists('file/' + self.addr):
+            os.makedirs('file/' + self.addr)
 
     def create_random_files(self):
         for i in range(2):
-            file = open('file/' + self.name + '/' + generate_random_text(4) + '-' + self.name + '.txt', 'w')
+            file = open('file/' + self.addr + '/' + generate_random_text(4) + '-' + self.addr + '.txt', 'w')
             file.write(generate_random_text())
             file.close()
 
     def read_files(self):
-        for file in os.listdir('file/' + self.name):
+        for file in os.listdir('file/' + self.addr):
             self.send_hash(file)
 
     def send_hash(self, file):

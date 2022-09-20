@@ -4,6 +4,7 @@ import socket
 import string
 import hashlib
 
+
 def generate_random_text(size=100):
     size = random.randint(1, size)
     return ''.join(random.choice(string.ascii_letters) for _ in range(size))

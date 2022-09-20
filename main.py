@@ -6,6 +6,7 @@ from util import parameter_error_message, display_help
 
 configs = dict()
 
+
 def main():
     print(sys.argv)
 
@@ -34,9 +35,11 @@ def create_peer():
 
 
 def create_super_peer():
-    for index, peer_name in enumerate(configs):
-        super_peer.SuperPeer(peer_name, get_config(index, 'addr'), get_config(index, 'port'),
-                            get_config(index, 'next'))
+    for peer_id in configs:
+        next_peer = get_config(peer_id, 'next')
+        super_peer.SuperPeer(peer_id, get_config(peer_id, 'addr'), get_config(peer_id, 'port'),
+                             (get_config(next_peer, 'addr'), get_config(next_peer, 'port')))
+
 
 def read_config():
     global configs
@@ -44,9 +47,9 @@ def read_config():
     configs = json.loads(file.read())
 
 
-def get_config(index, key):
+def get_config(peer_id, key):
     global configs
-    return list(configs.values())[index][key]
+    return configs[peer_id][key]
 
 
 main()

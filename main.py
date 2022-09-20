@@ -1,3 +1,4 @@
+import random
 import peer
 import super_peer
 import json
@@ -25,13 +26,15 @@ def filter_args():
             read_config()
             create_super_peer()
         case '-p':
+            read_config()
             create_peer()
         case _:
             parameter_error_message()
 
 
 def create_peer():
-    peer.Peer(sys.argv[2], int(sys.argv[3]), ("127.0.0.100", 4941))
+    sp = get_random_sp()
+    peer.Peer(sys.argv[2], int(sys.argv[3]), (sp[1]['addr'], sp[1]['port']))
 
 
 def create_super_peer():
@@ -45,11 +48,16 @@ def read_config():
     global configs
     file = open('config.json')
     configs = json.loads(file.read())
-
+    
 
 def get_config(peer_id, key):
     global configs
     return configs[peer_id][key]
+
+
+def get_random_sp():
+    global configs
+    return random.choice(list(configs.items()))
 
 
 main()

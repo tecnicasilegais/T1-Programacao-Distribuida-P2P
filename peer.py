@@ -3,8 +3,6 @@ import random
 import socket
 import string
 import hashlib
-import superpeer
-
 
 def generate_random_text(size=100):
     size = random.randint(1, size)

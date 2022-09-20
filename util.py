@@ -2,13 +2,14 @@ import hashlib
 import json
 import random
 import string
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 
 @unique
-class MsgType(Enum):
+class MsgType(IntEnum):
     FILE_INFO = 1
     CONNECT = 2
+    HEARTBEAT = 3
 
 
 def display_help():

@@ -14,6 +14,7 @@ class Peer:
         self.addr = addr
         self.port = port
         self.connected = False
+        self.operation_in_progress = False
 
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         self.socket.bind((addr, port))
@@ -63,12 +64,14 @@ class Peer:
                     continue
                 case MsgType.ANSWER_CONTENTS:
                     print('received:', data_json, flush=True)
+                    self.operation_in_progress = False
                     continue
                 case MsgType.ANSWER_RESOURCE:  # answers who has the file i requested
                     print(data_json, flush=True)
                     content = data_json['contents']
                     if not content['found']:
                         print('FILE NOT FOUND', content['file'], flush=True)
+                        self.operation_in_progress = False
                     else:
                         print('File Found at peer: ', content['location_ip'], 'port: ', content['location_port'])
                         self.send_message(
@@ -78,7 +81,7 @@ class Peer:
                     continue
                 case MsgType.GET_RESOURCE:
                     file = data_json['contents']['file']
-                    print('received request for file: ', file, flush=True)
+                    # print('received request for file: ', file, flush=True)
                     found = file in self.files
                     self.send_message(addr, create_message(MsgType.RETURN_RESOURCE, {
                         'file': file,
@@ -93,6 +96,7 @@ class Peer:
                     else:
                         print('Content downloaded: ', content['file'], flush=True)
                         print('The hash is: ', content['hash'], flush=True)
+                    self.operation_in_progress = False
                     continue
 
     def send_message(self, addr, message):

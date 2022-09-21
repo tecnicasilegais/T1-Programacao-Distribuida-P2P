@@ -53,7 +53,12 @@ class Peer:
     def receive_message(self):
         """ listen for messages """
         while True:
-            data, addr = self.socket.recvfrom(1024)
+            try:
+                data, addr = self.socket.recvfrom(1024)
+            except:
+                print('the file host is offline')
+                self.operation_in_progress = False
+                continue
             data_json = json.loads(data.decode('utf-8'))
             match data_json['type']:
                 case MsgType.CONFIRM:

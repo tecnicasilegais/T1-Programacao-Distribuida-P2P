@@ -3,7 +3,9 @@ import peer
 import super_peer
 import json
 import sys
-from util import parameter_error_message, display_help
+
+import util
+from util import parameter_error_message, display_help, MAX_HASH
 
 configs = dict()
 
@@ -38,10 +40,12 @@ def create_peer():
 
 
 def create_super_peer():
-    for peer_id in configs:
+    interval_size = int(MAX_HASH / len(configs))
+    for index, peer_id in enumerate(configs):
         next_peer = get_config(peer_id, 'next')
+        hash_interval = (index * interval_size, ((index+1) * interval_size)-1)
         super_peer.SuperPeer(peer_id, get_config(peer_id, 'addr'), get_config(peer_id, 'port'),
-                             (get_config(next_peer, 'addr'), get_config(next_peer, 'port')))
+                             (get_config(next_peer, 'addr'), get_config(next_peer, 'port')), hash_interval)
 
 
 def read_config():

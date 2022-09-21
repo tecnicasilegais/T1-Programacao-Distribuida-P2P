@@ -30,6 +30,8 @@ class SuperPeer:
         self.print_table_thread = threading.Thread(target=self.print_table)
         self.print_table_thread.start()
 
+        print(self.name, '- hash range starts at', self.hash_range[0], 'and ends at', self.hash_range[1])
+
     def receive_message(self):
         """ listen for messages """
         while True:
@@ -65,6 +67,7 @@ class SuperPeer:
 
     def connect(self, addr):
         self.connected_peers[addr] = time.time()
+        print(self.name,'- Peer connected', addr[0], addr[1])
         self.send_message(addr, create_message(MsgType.CONFIRM, None))
 
     def heartbeat(self, addr):
@@ -201,7 +204,7 @@ class SuperPeer:
             time.sleep(1)
 
     def clear_peer_hashes(self, peer):
-
+        print(self.name,'- Peer disconnected', peer)
         self.table = {k: v for k, v in self.table.items() if (v[0], v[1]) != peer}
         # print(self.name, 'tabela limpa ->', self.table)
 

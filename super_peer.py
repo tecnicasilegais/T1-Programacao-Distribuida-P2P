@@ -27,6 +27,9 @@ class SuperPeer:
         self.clear_peer_list_thread = threading.Thread(target=self.clear_peer_list)
         self.clear_peer_list_thread.start()
 
+        self.print_table_thread = threading.Thread(target=self.print_table)
+        self.print_table_thread.start()
+
     def receive_message(self):
         """ listen for messages """
         while True:
@@ -179,7 +182,6 @@ class SuperPeer:
 
                 self.send_message(self.next_peer, create_message(MsgType.SPREAD_FIND_RESOURCE, contents))
 
-
     def clear_peer_list(self):
         """Checks if there are disconnected peers in the peer list and removes the inactive ones"""
         while True:
@@ -201,8 +203,12 @@ class SuperPeer:
     def clear_peer_hashes(self, peer):
 
         self.table = {k: v for k, v in self.table.items() if (v[0], v[1]) != peer}
+        # print(self.name, 'tabela limpa ->', self.table)
 
-        print(self.name, 'tabela limpa ->', self.table)
+    def print_table(self):
+        while True:
+            print(self.name, self.table)
+            time.sleep(10)
 
     def send_message(self, addr, message):
         self.socket.sendto(message.encode(), addr)

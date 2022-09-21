@@ -4,6 +4,7 @@ import threading
 import time
 from typing import Any
 
+from shared_console import shared_print
 from util import MsgType, create_message
 
 
@@ -30,7 +31,7 @@ class SuperPeer:
         self.print_table_thread = threading.Thread(target=self.print_table)
         self.print_table_thread.start()
 
-        print(self.name, '- hash range starts at', self.hash_range[0], 'and ends at', self.hash_range[1])
+        print(self.name, '- hash range: (', self.hash_range[0], ' : ', self.hash_range[1], ')')
 
     def receive_message(self):
         """ listen for messages """
@@ -223,8 +224,8 @@ class SuperPeer:
 
     def print_table(self):
         while True:
-            print(self.name, self.table)
             time.sleep(10)
+            shared_print('{name} - dht: {table}'.format(name=self.name, table=self.table))
 
     def send_message(self, addr, message):
         self.socket.sendto(message.encode(), addr)

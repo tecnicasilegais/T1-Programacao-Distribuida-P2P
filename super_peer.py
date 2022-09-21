@@ -66,15 +66,18 @@ class SuperPeer:
                     self.continue_find_resource(data_json)
 
     def connect(self, addr):
+        """Connects to a new peer"""
         self.connected_peers[addr] = time.time()
-        print(self.name,'- Peer connected', addr[0], addr[1])
+        print(self.name, '- Peer connected', addr[0], addr[1])
         self.send_message(addr, create_message(MsgType.CONFIRM, None))
 
     def heartbeat(self, addr):
+        """receives heartbeats from peers and renews their connection"""
         if addr in self.connected_peers:
             self.connected_peers[addr] = time.time()
 
     def receive_file_info(self, data_json, addr):
+        """receive file info from a new joined peer"""
         if addr not in self.connected_peers:
             return
 
@@ -94,6 +97,8 @@ class SuperPeer:
             self.send_message(self.next_peer, create_message(MsgType.SPREAD_HASH, spread_hash_values))
 
     def receive_hashes_from_sp(self, data_json):
+        """receives hashes from other super peers and checks if it's within this Super Peer range. If it's not,
+        it spreads the hashes again """
         rcv_table = data_json['contents']
         spread_hash_values = dict()
         # print('receiving data', self.name, self.hash_range)
@@ -119,6 +124,7 @@ class SuperPeer:
         self.send_message(self.next_peer, create_message(MsgType.SPREAD_CLEAR, data_json['contents']))
 
     def init_content_recover(self, peer_addr):
+        """Peer asked this Super Peer to list all the available resources in the system"""
         files = [name for _, (_, _, name) in self.table.items()]
         # print('init', self.name, files)
         self.send_message(self.next_peer, create_message(MsgType.SPREAD_ASK_CONTENTS, {
@@ -129,6 +135,8 @@ class SuperPeer:
         }))
 
     def continue_content_recover(self, data_json):
+        """spread of the content list from the system. Super peers pass the request to every SP in the token ring
+        and, at the end, the initial Super Peer returns the contents to the peer who asked """
         contents = data_json['contents']
         if self.name == contents['origin']:
             # print(self.name, 'sending to peer')
@@ -142,6 +150,8 @@ class SuperPeer:
             self.send_message(self.next_peer, create_message(MsgType.SPREAD_ASK_CONTENTS, contents))
 
     def init_find_resource(self, peer_addr, data_json):
+        """Peer asked this Super Peer to point him to the peer who has a given file in the system. Super peer will
+        try to find it in its own table, if it is not, the super peer will pass the request to the token ring """
         file_name = data_json['contents']
 
         files = {name: (addr, port) for k, (addr, port, name) in self.table.items()}
@@ -167,6 +177,8 @@ class SuperPeer:
             }))
 
     def continue_find_resource(self, data_json):
+        """The file request was spreaded to the token ring, every super peer will look for the file and, if it finds,
+        will point to the peer who has the file """
         contents = data_json['contents']
         if self.name == contents['origin']:
             peer_addr = (contents['address'], contents['port'])
@@ -204,7 +216,8 @@ class SuperPeer:
             time.sleep(1)
 
     def clear_peer_hashes(self, peer):
-        print(self.name,'- Peer disconnected', peer)
+        """clear the hashes from disconnected peers"""
+        print(self.name, '- Peer disconnected', peer)
         self.table = {k: v for k, v in self.table.items() if (v[0], v[1]) != peer}
         # print(self.name, 'tabela limpa ->', self.table)
 

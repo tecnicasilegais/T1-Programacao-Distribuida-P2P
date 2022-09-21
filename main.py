@@ -1,4 +1,6 @@
 import random
+from time import sleep
+
 import peer
 import super_peer
 import json
@@ -36,7 +38,19 @@ def filter_args():
 
 def create_peer():
     sp = get_random_sp()  # choose a random super peer to connect
-    peer.Peer(sys.argv[2], int(sys.argv[3]), (sp[1]['addr'], sp[1]['port']))
+    if len(sys.argv) <= 3:
+        parameter_error_message()
+
+    p = peer.Peer(sys.argv[2], int(sys.argv[3]), (sp[1]['addr'], sp[1]['port']))
+
+    while True:
+        if p.connected:
+            if len(sys.argv) > 4:
+                p.find_resource(sys.argv[4])
+            else:
+                p.ask_contents()
+            break
+        sleep(1)
 
 
 def create_super_peer():

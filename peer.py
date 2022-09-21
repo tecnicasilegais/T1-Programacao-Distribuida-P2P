@@ -46,6 +46,9 @@ class Peer:
     def ask_contents(self):
         self.send_message(self.sp_addr, create_message(MsgType.ASK_CONTENTS, None))
 
+    def find_resource(self, file_name):
+        self.send_message(self.sp_addr, create_message(MsgType.FIND_RESOURCE, file_name))
+
     def receive_message(self):
         """ listen for messages """
         while True:
@@ -56,10 +59,40 @@ class Peer:
                     self.connected = True
                     self.send_heartbeat_thread.start()
                     self.send_files_info()
-                    self.ask_contents()
+                    # self.ask_contents()
                     continue
                 case MsgType.ANSWER_CONTENTS:
                     print('received:', data_json, flush=True)
+                    continue
+                case MsgType.ANSWER_RESOURCE:  # answers who has the file i requested
+                    print(data_json, flush=True)
+                    content = data_json['contents']
+                    if not content['found']:
+                        print('FILE NOT FOUND', content['file'], flush=True)
+                    else:
+                        print('File Found at peer: ', content['location_ip'], 'port: ', content['location_port'])
+                        self.send_message(
+                            (content['location_ip'], content['location_port']), create_message(MsgType.GET_RESOURCE, {
+                                'file': content['file']
+                            }))
+                    continue
+                case MsgType.GET_RESOURCE:
+                    file = data_json['contents']['file']
+                    print('received request for file: ', file, flush=True)
+                    found = file in self.files
+                    self.send_message(addr, create_message(MsgType.RETURN_RESOURCE, {
+                        'file': file,
+                        'hash': self.files[file] if found else None,
+                        'found': found
+                    }))
+                    continue
+                case MsgType.RETURN_RESOURCE:
+                    content = data_json['contents']
+                    if not content['found']:
+                        print('content not downloaded - FILE NOT FOUND: ', content['file'], flush=True)
+                    else:
+                        print('Content downloaded: ', content['file'], flush=True)
+                        print('The hash is: ', content['hash'], flush=True)
                     continue
 
     def send_message(self, addr, message):

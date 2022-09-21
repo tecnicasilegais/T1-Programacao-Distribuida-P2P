@@ -18,6 +18,11 @@ class MsgType(IntEnum):
     ASK_CONTENTS = 6  # peer asks for content list
     SPREAD_ASK_CONTENTS = 7  # super peer spreads the request
     ANSWER_CONTENTS = 8  # super peer returns the contents
+    FIND_RESOURCE = 9
+    SPREAD_FIND_RESOURCE = 10
+    ANSWER_RESOURCE = 11
+    GET_RESOURCE = 12
+    RETURN_RESOURCE = 13
 
 
 def display_help():

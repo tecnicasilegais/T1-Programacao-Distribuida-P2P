@@ -53,6 +53,12 @@ class SuperPeer:
                     self.init_content_recover(addr)
                 case MsgType.SPREAD_ASK_CONTENTS:
                     self.continue_content_recover(data_json)
+                    continue
+                case MsgType.FIND_RESOURCE:
+                    self.init_find_resource(addr, data_json)
+                    continue
+                case MsgType.SPREAD_FIND_RESOURCE:
+                    self.continue_find_resource(data_json)
 
     def connect(self, addr):
         self.connected_peers[addr] = time.time()
@@ -128,6 +134,51 @@ class SuperPeer:
             contents['files'].extend(files)
             # print(self.name, contents['files'])
             self.send_message(self.next_peer, create_message(MsgType.SPREAD_ASK_CONTENTS, contents))
+
+    def init_find_resource(self, peer_addr, data_json):
+        file_name = data_json['contents']
+
+        files = {name: (addr, port) for k, (addr, port, name) in self.table.items()}
+
+        if file_name in files:
+            self.send_message(peer_addr, create_message(MsgType.ANSWER_RESOURCE, {
+                'address': peer_addr[0],
+                'port': peer_addr[1],
+                'file': file_name,
+                'found': True,
+                'location_ip': files[file_name][0],
+                'location_port': files[file_name][1]
+            }))
+        else:
+            self.send_message(self.next_peer, create_message(MsgType.SPREAD_FIND_RESOURCE, {
+                'address': peer_addr[0],
+                'port': peer_addr[1],
+                'file': file_name,
+                'origin': self.name,
+                'found': False,
+                'location_ip': None,
+                'location_port': None
+            }))
+
+    def continue_find_resource(self, data_json):
+        contents = data_json['contents']
+        if self.name == contents['origin']:
+            peer_addr = (contents['address'], contents['port'])
+            self.send_message(peer_addr, create_message(MsgType.ANSWER_RESOURCE, contents))
+        else:
+            if contents['found']:
+                self.send_message(self.next_peer, create_message(MsgType.SPREAD_FIND_RESOURCE, contents))
+            else:
+                files = {name: (addr, port) for k, (addr, port, name) in self.table.items()}
+
+                if contents['file'] in files:
+                    contents['found'] = True
+                    file_data = files[contents['file']]
+                    contents['location_ip'] = file_data[0]
+                    contents['location_port'] = file_data[1]
+
+                self.send_message(self.next_peer, create_message(MsgType.SPREAD_FIND_RESOURCE, contents))
+
 
     def clear_peer_list(self):
         """Checks if there are disconnected peers in the peer list and removes the inactive ones"""
